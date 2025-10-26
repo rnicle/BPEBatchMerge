@@ -35,10 +35,8 @@ BPE3 >> addToVocabulary: aString [
 
 { #category : 'merges' }
 BPE3 >> batchMerges: anInteger [
-    | numberOfFusion sorted paire i count safeFusion firstSeen lastSeen assoc left right fusionCount |
-    numberOfFusion := anInteger - vocabulary size.
-    fusionCount := 0.
-    [ numberOfFusion > 0 ] whileTrue: [
+    |  sorted paire i count safeFusion firstSeen lastSeen assoc left right  |
+    [self paires size ~=0 ] whileTrue: [
         safeFusion := Set new.
         firstSeen := Set new.
         lastSeen := Set new.
@@ -47,7 +45,7 @@ BPE3 >> batchMerges: anInteger [
         paire := sorted first key.
         i := 1.
         count := sorted size.
-        [ i <= count and: [(sorted at: i) key = paire] ] whileTrue: [
+      [ (i<= count ) and: [ (sorted at: i) key = paire] ]whileTrue: [
             assoc := sorted at: i.
             left := assoc value first.
             right := assoc value second.
@@ -60,14 +58,8 @@ BPE3 >> batchMerges: anInteger [
             i := i + 1.
         ].
         safeFusion do: [ :each |
-            fusionCount < numberOfFusion
-                ifTrue: [
                     self mergesOneStep: each.
-                    fusionCount := fusionCount + 1.
                 ]
-                ifFalse: [ ^ self ].
-        ].
-        numberOfFusion := numberOfFusion - fusionCount.
     ].
 
 ]
@@ -76,19 +68,13 @@ BPE3 >> batchMerges: anInteger [
 BPE3 >> computePairs [
 	|current|
 	current := self words firstLink .
-	[current notNil ] whileTrue: [ |prev| 
-	prev:= Array new .
+	[current notNil ] whileTrue: [
 	[current nextLink value ~='endOfWord'] whileTrue: [
-	{(current value at:1) . (current nextLink value at:1) } ~= prev ifTrue:[ |paire position |
+	|paire position |
 			paire := self extractPairAndOccurencesFromCurrentNodeToNextNode: current .
 			position := self extractPairAndPositionFromCurrentNodeToNextNode: current .
 			self addToPaires: paire .
 			self addToPairesPosition: position .
-			prev :=paire key.
-			]
-		ifFalse: [ 
-			prev:= Array new .
-			 ].
 			current := current nextLink .
 			].
 		current:=current nextLink nextLink .
@@ -148,8 +134,6 @@ BPE3 >> fromText: anObject [
 BPE3 >> fusion: anArray [
 	(anArray at: 1) value at: 1 put: ((anArray at:1) value at: 1) , ((anArray at: 2) value at: 1).
 	words removeLink: (anArray at: 2)
-	"(anArray at: 1) nextLink: (anArray at: 2) nextLink .
-	(anArray at: 2) nextLink previousLink: (anArray at: 1)."
 ]
 
 { #category : 'initialize' }
@@ -161,15 +145,6 @@ BPE3 >> initialize [
 	paires := Bag new .
 	pairesPosition := Dictionary new.
 	merges:= OrderedCollection new .
-]
-
-{ #category : 'compute' }
-BPE3 >> max: aDictionary [
-	|max|
-	max:=Association new.
-	max value: 0.	
-	aDictionary associationsDo: [ :each| each value > max value ifTrue:[max:=each ] ].
-	^max 
 ]
 
 { #category : 'accessing' }
@@ -224,9 +199,6 @@ BPE3 >> prepareWordrsFrom: anObject [
 
 { #category : 'compute' }
 BPE3 >> prepareWordrsFromText: aText [
-	"Retourne un array de tokens selon les regles:
-	- lettres,chiffres et underscore restent ensemble
-	-tous les autres caracteres speciaux sont des tokens separes"
 	|bag currentWord|
 	bag := Bag new.
 	currentWord :=''.
@@ -304,65 +276,6 @@ BPE3 >> update1: anAssociation [
 	self paires removeKey: anAssociation ifAbsent: [  ].
 	"self pairesPosition removeKey: anAssociation key ifAbsent: [  ]."
 	self pairesPosition removeKey: anAssociation ifAbsent: [  ].
-]
-
-{ #category : 'updating' }
-BPE3 >> update: anAssociation [
-	|position|
-	position:= self pairesPosition at: anAssociation key.
-	position do:[ :each |	
-		((each first) previousLink value isNotNil and: [ (each first) previousLink value ~= 'endOfWord' ])
-		ifTrue: [ 
-			(each second) nextLink value ~='endOfWord' 
-			ifTrue: [
-				"suppression des anciens paires"
-				self updatePaires: (self extractPairAndOccurencesFromPreviousNodeToCurrentNode: (each first)).
-				self updatePairesPosition: (self extractPairAndPositionFromPreviousNodeToCurrentNode: (each first)).
-				self updatePaires: (self extractPairAndOccurencesFromCurrentNodeToNextNode: (each second)).
-				self updatePairesPosition: (self extractPairAndPositionFromCurrentNodeToNextNode: (each second)).
-				"fusion"
-				self fusion: each .
-				"ajouts des nouveaux paires"
-				self addToPaires: (self extractPairAndOccurencesFromPreviousNodeToCurrentNode: (each first)).
-				self addToPairesPosition: (self extractPairAndPositionFromPreviousNodeToCurrentNode: (each first)).
-				self addToPaires: (self extractPairAndOccurencesFromCurrentNodeToNextNode: (each first)).
-				self addToPairesPosition: (self extractPairAndPositionFromCurrentNodeToNextNode: (each first)).
-				] 
-			ifFalse: [
-				"suppression des anciens paires"
-				self updatePaires: (self extractPairAndOccurencesFromPreviousNodeToCurrentNode: (each first)).
-				self updatePairesPosition: (self extractPairAndPositionFromPreviousNodeToCurrentNode: (each first)).
-				"fusions"
-				self fusion: each .
-				"ajouts des nouveaux paires"
-				self addToPaires: (self extractPairAndOccurencesFromPreviousNodeToCurrentNode: (each first)).
-				self addToPairesPosition: (self extractPairAndPositionFromPreviousNodeToCurrentNode: (each first)).
-				] 
-			 ]
-		
-		 ifFalse: 
-			[(each second) nextLink value ~= 'endOfWord' 
-			ifTrue: [ 
-				"suppression des anciens paires"
-				self updatePaires: (self extractPairAndOccurencesFromCurrentNodeToNextNode: (each second)).
-				self updatePairesPosition: (self extractPairAndPositionFromCurrentNodeToNextNode: (each second)).
-				"fusions"
-				self fusion: each .
-				"ajouts des nouveaux paires"
-				self addToPaires: (self extractPairAndOccurencesFromCurrentNodeToNextNode: (each first)).
-				self addToPairesPosition: (self extractPairAndPositionFromCurrentNodeToNextNode: (each first)).
-				 ] 
-			ifFalse: [
-				"suppresions des anciens paires"
-				self updatePaires: (self extractPairAndOccurencesFromCurrentNodeToNextNode: (each first)).
-				self updatePairesPosition: (self extractPairAndPositionFromCurrentNodeToNextNode: (each first)).
-				"fusions"
-				self fusion: each
-				].
-			].
-		].
-	self paires removeKey: anAssociation key ifAbsent: [].
-	self pairesPosition removeKey: anAssociation key ifAbsent: [].
 ]
 
 { #category : 'update' }

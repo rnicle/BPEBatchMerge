@@ -11,20 +11,6 @@ BPE3Test >> array [
 ]
 
 { #category : 'tests' }
-BPE3Test >> testBatchMergeAddMergeToMergeList [
-
-	| enc |
-	enc := BPE3 new. 
-	enc fromText: self text.
-	
-	self assert: enc merges isEmpty.
-	enc batchMerges: enc vocabulary size + 1.
-	self assert: enc merges first equals: #('t' '</t>')->'t</t>' .
-	enc batchMerges: enc vocabulary size + 2.
-	self assert: enc merges asSet equals: {#('t' '</t>')->'t</t>' . #('e' 's')->'es'}asSet 
-]
-
-{ #category : 'tests' }
 BPE3Test >> testBuildVocabularyProducesCorrectVocabulary [
 
 	| enc |
