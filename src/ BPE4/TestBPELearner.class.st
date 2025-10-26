@@ -1,20 +1,20 @@
 Class {
-	#name : 'BPE3Test',
+	#name : 'TestBPELearner',
 	#superclass : 'TestCase',
-	#category : 'BPE3',
-	#package : 'BPE3'
+	#category : ' BPE4',
+	#package : ' BPE4'
 }
 
-{ #category : 'accessing' }
-BPE3Test >> array [ 
+{ #category : 'private' }
+TestBPELearner >> array [ 
 	^ {'old' . 'old' . 'old' . 'old' . 'old' . 'old' . 'old' . 'older' . 'older' . 'older' . 'finest' . 'finest' . 'finest' . 'finest' . 'finest' . 'finest' . 'finest' . 'finest' . 'finest' . 'lowest' . 'lowest' . 'lowest' . 'lowest'}
 ]
 
 { #category : 'tests' }
-BPE3Test >> testBuildVocabularyProducesCorrectVocabulary [
+TestBPELearner >> testBuildVocabularyProducesCorrectVocabulary [
 
 	| enc |
-	enc := BPE3 new. 
+	enc := BPELearner new. 
 	enc fromText: self text.
 	self 
 		assertCollection: enc vocabulary asSet
@@ -22,10 +22,10 @@ BPE3Test >> testBuildVocabularyProducesCorrectVocabulary [
 ]
 
 { #category : 'tests' }
-BPE3Test >> testBuildVocabularyProducesCorrectVocabularyFromArray [
+TestBPELearner >> testBuildVocabularyProducesCorrectVocabularyFromArray [
 
 	| enc |
-	enc := BPE3 new. 
+	enc := BPELearner new. 
 	enc fromText: self array .
 	self 
 		assertCollection: enc vocabulary asSet
@@ -33,20 +33,20 @@ BPE3Test >> testBuildVocabularyProducesCorrectVocabularyFromArray [
 ]
 
 { #category : 'tests' }
-BPE3Test >> testBuildVocabularyProducesCorrectVocabularyText2 [
+TestBPELearner >> testBuildVocabularyProducesCorrectVocabularyText2 [
 
 	| enc |
-	enc := BPE3 new. 
+	enc := BPELearner new. 
 	enc fromText: self text2.
 	enc computeVocabulary.
 	self assertCollection: enc vocabulary asSet hasSameElements: { '</t>' . 'd' . 'e' . 'i' . 'l' . 'n' . 'o' . 'r' . 's' . 't' . 'w'} asSet
 ]
 
 { #category : 'tests' }
-BPE3Test >> testComputePairs [
+TestBPELearner >> testComputePairs [
 
 	| enc |
-	enc := BPE3 new. 
+	enc := BPELearner new. 
 	enc fromText: self text.
 	
 	self assert: (enc paires occurrencesOf: {'o' . 'l'}) equals: 10. 
@@ -61,10 +61,10 @@ BPE3Test >> testComputePairs [
 ]
 
 { #category : 'tests' }
-BPE3Test >> testComputePairsArray [
+TestBPELearner >> testComputePairsArray [
 
 	| enc |
-	enc := BPE3 new. 
+	enc := BPELearner new. 
 	enc fromText: self array .
 	
 	self assert: (enc paires occurrencesOf: {'o' . 'l'}) equals: 10. 
@@ -79,10 +79,10 @@ BPE3Test >> testComputePairsArray [
 ]
 
 { #category : 'tests' }
-BPE3Test >> testComputePairsText2 [
+TestBPELearner >> testComputePairsText2 [
 
 	| enc |
-	enc := BPE3 new. 
+	enc := BPELearner new. 
 	enc fromText: self text2.
 	
 	self assert: (enc paires occurrencesOf: {'e' .'s'}) equals: 9. 
@@ -98,10 +98,10 @@ BPE3Test >> testComputePairsText2 [
 ]
 
 { #category : 'tests' }
-BPE3Test >> testMergeOneStepAddMergeToMergeList [
+TestBPELearner >> testMergeOneStepAddMergeToMergeList [
 
 	| enc |
-	enc := BPE3 new. 
+	enc := BPELearner new. 
 	enc fromText: self text.
 	enc computeVocabulary.
 	
@@ -111,10 +111,10 @@ BPE3Test >> testMergeOneStepAddMergeToMergeList [
 ]
 
 { #category : 'tests' }
-BPE3Test >> testMergeOneStepIncreaseVocabularyAndMerges [
+TestBPELearner >> testMergeOneStepIncreaseVocabularyAndMerges [
 
 	| enc mergeOldSize |
-	enc := BPE3 new. 
+	enc := BPELearner new. 
 	enc fromText: self text.
 	
 	self assert: enc vocabulary size equals: 12.
@@ -126,10 +126,10 @@ BPE3Test >> testMergeOneStepIncreaseVocabularyAndMerges [
 ]
 
 { #category : 'tests' }
-BPE3Test >> testMergeOneStepRecomputePairs [
+TestBPELearner >> testMergeOneStepRecomputePairs [
 
 	| enc|
-	enc := BPE3 new. 
+	enc := BPELearner new. 
 	enc fromText: self text.
 	
 	enc mergesOneStep .
@@ -145,10 +145,10 @@ BPE3Test >> testMergeOneStepRecomputePairs [
 ]
 
 { #category : 'tests' }
-BPE3Test >> testTwoMerges [
+TestBPELearner >> testTwoMerges [
 
 	| enc |
-	enc := BPE3 new. 
+	enc := BPELearner new. 
 	enc fromText: self text.
 	enc computeVocabulary.
 	enc mergesOneStep .
@@ -159,7 +159,7 @@ BPE3Test >> testTwoMerges [
 ]
 
 { #category : 'accessing' }
-BPE3Test >> text [
+TestBPELearner >> text [
 	^ 'old old old old old old old 
 older older older
 finest finest finest finest finest finest finest finest finest 
@@ -168,7 +168,7 @@ lowest lowest lowest lowest
 ]
 
 { #category : 'accessing structure variables' }
-BPE3Test >> text2 [
+TestBPELearner >> text2 [
 	^ '
 low low low low low
 lower lower
