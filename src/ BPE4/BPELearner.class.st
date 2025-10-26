@@ -150,20 +150,16 @@ BPELearner >> prepareWordsFromArray:anArray [
 { #category : 'pretokenisation' }
 BPELearner >> pretokenization:aText [
 "Transforme le texte en un bag de tokens en séparant les mots et les caractères spéciaux."
-	|bag currentWord|
+	|rawWords bag|
 	bag := Bag new.
-	currentWord :=''.
-	aText do: [ :ch | (ch isAlphaNumeric or: [ ch = $_ ])
-		ifTrue:[currentWord :=currentWord, ch asString]
-		 ifFalse: [currentWord isEmpty ifFalse: [
-				bag add: currentWord.
-				currentWord :=''.
-				].
-			(ch isSeparator ) ifFalse: [bag add: ch asString].
-			].
-		].
-	currentWord isEmpty ifFalse: [ bag add: currentWord ].
-	^bag
+	rawWords :=(aText substrings: {Character space . Character cr . Character tab}).
+	bag addAll: (rawWords collect: [:each|
+		|col|
+		col:=OrderedCollection new: each size + 1 .
+		each do: [:aChar|col add: aChar asString].
+		col ] ).
+	^bag 
+	
 ]
 
 { #category : 'update' }
