@@ -149,7 +149,7 @@ BPELearner >> prepareWordsFromArray:anArray [
 
 { #category : 'pretokenisation' }
 BPELearner >> pretokenization:aText [
-"Transforme le texte en un bag de tokens en séparant les mots et les caractères spéciaux."
+"Transforme le texte en un bag de tokens en séparant les mots."
 	|rawWords bag|
 	bag := Bag new.
 	rawWords :=(aText substrings: {Character space . Character cr . Character tab}).
